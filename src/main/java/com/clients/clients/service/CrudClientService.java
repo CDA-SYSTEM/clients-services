@@ -9,4 +9,5 @@ public interface CrudClientService {
     List<Client> getAllClients();
     Client updateClient(Long id, Client client);
     void deleteClient(Long id);
+    void setClientActiveStatus(Long id, boolean active);
 }
