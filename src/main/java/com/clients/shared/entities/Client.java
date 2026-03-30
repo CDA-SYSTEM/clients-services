@@ -5,6 +5,7 @@ import java.time.LocalDate;
 
 @Entity
 public class Client {
+        private boolean active = true;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -43,6 +44,8 @@ public class Client {
 
     // Getters and setters
     public Long getId() { return id; }
+    public boolean isActive() { return active; }
+    public void setActive(boolean active) { this.active = active; }
     public void setId(Long id) { this.id = id; }
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
