@@ -1,4 +1,4 @@
--- Flyway migration: Insert person types and document types
+-- Datos iniciales (tras crear tablas en V1)
 
 INSERT INTO person_type (type) VALUES ('Propietario');
 INSERT INTO person_type (type) VALUES ('Dueño');
