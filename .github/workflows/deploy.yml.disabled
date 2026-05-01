@@ -2,7 +2,7 @@ name: Deploy Java Service
 
 on:
   push:
-    branches: [ "develop", "feature/config-deploy" ]
+    branches: [  ] ## Desahibilite pra docker
 
 jobs:
   deploy:
@@ -34,3 +34,4 @@ jobs:
             # 2. Reiniciar o Iniciar el servicio con PM2
             # Ajustado al nombre real del archivo: services-0.0.1-SNAPSHOT.jar
             pm2 restart clients-service || pm2 start "java -jar target/services-0.0.1-SNAPSHOT.jar" --name clients-service
+# se puede eliminar
