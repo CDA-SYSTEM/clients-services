@@ -110,6 +110,101 @@ public class ClientController {
         }
     }
 
+     @GetMapping("/{id}")
+    @Operation(summary = "Obtener cliente por ID", description = "Obtiene los datos de un cliente activo por su ID")
+    public ApiResponse<?> getClientById(@PathVariable Long id) {
+        return crudClientService.getActiveClientById(id)
+                .map(client -> {
+                    ClientResponseDTO responseDto = new ClientResponseDTO();
+                    responseDto.setId(client.getId());
+                    responseDto.setNombre(client.getNombre());
+                    responseDto.setApellido(client.getApellido());
+                    responseDto.setBirthDate(client.getBirthDate());
+                    responseDto.setIdentity(client.getIdentity());
+                    responseDto.setDireccion(client.getDireccion());
+                    responseDto.setCelular(client.getCelular());
+                    responseDto.setEmail(client.getEmail());
+                    if (client.getDocumentType() != null) {
+                        ClientResponseDTO.DocumentTypeDTO docDto = new ClientResponseDTO.DocumentTypeDTO();
+                        docDto.setId(client.getDocumentType().getId());
+                        docDto.setType(client.getDocumentType().getType());
+                        responseDto.setDocumentType(docDto);
+                    }
+                    if (client.getPersonType() != null) {
+                        ClientResponseDTO.PersonTypeDTO perDto = new ClientResponseDTO.PersonTypeDTO();
+                        perDto.setId(client.getPersonType().getId());
+                        perDto.setType(client.getPersonType().getType());
+                        responseDto.setPersonType(perDto);
+                    }
+                    return new ApiResponse<>(true, "Cliente encontrado", responseDto);
+                })
+                .orElse(new ApiResponse<>(false, "Cliente no encontrado o inactivo", null));
+    }
+
+    @GetMapping("/all")
+    @Operation(summary = "Listar todos los clientes", description = "Lista todos los clientes incluyendo los inactivos")
+    public ApiResponse<?> getAllClientsIncludingInactive() {
+        List<Client> clients = crudClientService.getAllClientsIncludingInactive();
+        List<ClientResponseDTO> responseDtos = clients.stream().map(client -> {
+            ClientResponseDTO dto = new ClientResponseDTO();
+            dto.setId(client.getId());
+            dto.setNombre(client.getNombre());
+            dto.setApellido(client.getApellido());
+            dto.setBirthDate(client.getBirthDate());
+            dto.setIdentity(client.getIdentity());
+            dto.setDireccion(client.getDireccion());
+            dto.setCelular(client.getCelular());
+            dto.setEmail(client.getEmail());
+            dto.setActive(client.isActive());
+            if (client.getDocumentType() != null) {
+                ClientResponseDTO.DocumentTypeDTO docDto = new ClientResponseDTO.DocumentTypeDTO();
+                docDto.setId(client.getDocumentType().getId());
+                docDto.setType(client.getDocumentType().getType());
+                dto.setDocumentType(docDto);
+            }
+            if (client.getPersonType() != null) {
+                ClientResponseDTO.PersonTypeDTO perDto = new ClientResponseDTO.PersonTypeDTO();
+                perDto.setId(client.getPersonType().getId());
+                perDto.setType(client.getPersonType().getType());
+                dto.setPersonType(perDto);
+            }
+            return dto;
+        }).collect(java.util.stream.Collectors.toList());
+        return new ApiResponse<>(true, "Clientes listados", responseDtos);
+    }
+
+    @GetMapping("/{id}/full")
+    @Operation(summary = "Obtener cliente por ID (sin filtro)", description = "Obtiene los datos de un cliente por su ID sin importar su estado activo")
+    public ApiResponse<?> getClientByIdIncludingInactive(@PathVariable Long id) {
+        return crudClientService.getClientByIdIncludingInactive(id)
+                .map(client -> {
+                    ClientResponseDTO responseDto = new ClientResponseDTO();
+                    responseDto.setId(client.getId());
+                    responseDto.setNombre(client.getNombre());
+                    responseDto.setApellido(client.getApellido());
+                    responseDto.setBirthDate(client.getBirthDate());
+                    responseDto.setIdentity(client.getIdentity());
+                    responseDto.setDireccion(client.getDireccion());
+                    responseDto.setCelular(client.getCelular());
+                    responseDto.setEmail(client.getEmail());
+                    responseDto.setActive(client.isActive());
+                    if (client.getDocumentType() != null) {
+                        ClientResponseDTO.DocumentTypeDTO docDto = new ClientResponseDTO.DocumentTypeDTO();
+                        docDto.setId(client.getDocumentType().getId());
+                        docDto.setType(client.getDocumentType().getType());
+                        responseDto.setDocumentType(docDto);
+                    }
+                    if (client.getPersonType() != null) {
+                        ClientResponseDTO.PersonTypeDTO perDto = new ClientResponseDTO.PersonTypeDTO();
+                        perDto.setId(client.getPersonType().getId());
+                        perDto.setType(client.getPersonType().getType());
+                        responseDto.setPersonType(perDto);
+                    }
+                    return new ApiResponse<>(true, "Cliente encontrado", responseDto);
+                })
+                .orElse(new ApiResponse<>(false, "Cliente no encontrado", null));
+    }
+
     @PutMapping("/{id}/activate")
     @Operation(summary = "Activar cliente", description = "Activa un cliente previamente desactivado")
     public ApiResponse<?> activateClient(@PathVariable Long id) {

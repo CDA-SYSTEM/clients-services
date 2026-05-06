@@ -10,6 +10,7 @@ import com.clients.clients.documentType.CrudDocumentTypeService;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CrudClientServiceImpl implements CrudClientService {
@@ -44,6 +45,11 @@ public class CrudClientServiceImpl implements CrudClientService {
     }
 
     @Override
+    public List<Client> getAllClientsIncludingInactive() {
+        return clientRepository.findAll();
+    }
+
+    @Override
     public Client updateClient(Long id, Client client) {
         Client existing = getClientById(id);
         if (existing != null) {
@@ -66,5 +72,15 @@ public class CrudClientServiceImpl implements CrudClientService {
         Client client = clientRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado"));
         client.setActive(active);
         clientRepository.save(client);
+    }
+
+    @Override
+    public Optional<Client> getActiveClientById(Long id) {
+        return clientRepository.findByIdAndActiveTrue(id);
+    }
+
+    @Override
+    public Optional<Client> getClientByIdIncludingInactive(Long id) {
+        return clientRepository.findById(id);
     }
 }
