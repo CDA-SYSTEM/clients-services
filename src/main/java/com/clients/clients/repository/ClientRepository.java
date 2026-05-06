@@ -11,4 +11,5 @@ public interface ClientRepository extends JpaRepository<Client, Long>, JpaSpecif
 	List<Client> findAllByActiveTrue();
 	Client findByIdentity(String identity);
 	Optional<Client> findByIdAndActiveTrue(Long id);
+	Optional<Client> findById(Long id);
 }

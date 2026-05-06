@@ -11,6 +11,7 @@ public class ClientResponseDTO {
     private String direccion;
     private String celular;
     private String email;
+    private boolean active;
     private DocumentTypeDTO documentType;
     private PersonTypeDTO personType;
 
@@ -49,6 +50,8 @@ public class ClientResponseDTO {
     public void setCelular(String celular) { this.celular = celular; }
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
+    public boolean isActive() { return active; }
+    public void setActive(boolean active) { this.active = active; }
     public DocumentTypeDTO getDocumentType() { return documentType; }
     public void setDocumentType(DocumentTypeDTO documentType) { this.documentType = documentType; }
     public PersonTypeDTO getPersonType() { return personType; }

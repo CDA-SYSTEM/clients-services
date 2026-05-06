@@ -45,6 +45,11 @@ public class CrudClientServiceImpl implements CrudClientService {
     }
 
     @Override
+    public List<Client> getAllClientsIncludingInactive() {
+        return clientRepository.findAll();
+    }
+
+    @Override
     public Client updateClient(Long id, Client client) {
         Client existing = getClientById(id);
         if (existing != null) {
@@ -72,5 +77,10 @@ public class CrudClientServiceImpl implements CrudClientService {
     @Override
     public Optional<Client> getActiveClientById(Long id) {
         return clientRepository.findByIdAndActiveTrue(id);
+    }
+
+    @Override
+    public Optional<Client> getClientByIdIncludingInactive(Long id) {
+        return clientRepository.findById(id);
     }
 }
