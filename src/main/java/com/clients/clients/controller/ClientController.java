@@ -112,7 +112,7 @@ public class ClientController {
     }
 
      @GetMapping("/{id}")
-    @Operation(summary = "Obtener cliente por ID", description = "Obtiene los datos de un cliente activo por su ID")
+    @Operation(summary = "Obtener cliente activo por ID", description = "Obtiene los datos de un cliente solo si está activo (no ha sido eliminado con soft delete). Retorna error si no existe o está inactivo.")
     public ApiResponse<?> getClientById(@PathVariable Long id) {
         return crudClientService.getActiveClientById(id)
                 .map(client -> {
