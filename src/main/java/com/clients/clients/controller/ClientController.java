@@ -103,31 +103,9 @@ public class ClientController {
     @Operation(summary = "Listar todos los clientes (incluso inactivos)", description = "Lista todos los clientes registrados en la base de datos, incluyendo aquellos que han sido desactivados (soft delete). El campo 'active' indica el estado de cada cliente.")
     public ApiResponse<?> getAllClientsIncludingInactive() {
         List<Client> clients = crudClientService.getAllClientsIncludingInactive();
-        List<ClientResponseDTO> responseDtos = clients.stream().map(client -> {
-            ClientResponseDTO dto = new ClientResponseDTO();
-            dto.setId(client.getId());
-            dto.setNombre(client.getNombre());
-            dto.setApellido(client.getApellido());
-            dto.setBirthDate(client.getBirthDate());
-            dto.setIdentity(client.getIdentity());
-            dto.setDireccion(client.getDireccion());
-            dto.setCelular(client.getCelular());
-            dto.setEmail(client.getEmail());
-            dto.setActive(client.isActive());
-            if (client.getDocumentType() != null) {
-                ClientResponseDTO.DocumentTypeDTO docDto = new ClientResponseDTO.DocumentTypeDTO();
-                docDto.setId(client.getDocumentType().getId());
-                docDto.setType(client.getDocumentType().getType());
-                dto.setDocumentType(docDto);
-            }
-            if (client.getPersonType() != null) {
-                ClientResponseDTO.PersonTypeDTO perDto = new ClientResponseDTO.PersonTypeDTO();
-                perDto.setId(client.getPersonType().getId());
-                perDto.setType(client.getPersonType().getType());
-                dto.setPersonType(perDto);
-            }
-            return dto;
-        }).collect(java.util.stream.Collectors.toList());
+        List<ClientResponseDTO> responseDtos = clients.stream()
+                .map(this::toResponseDTO)
+                .collect(java.util.stream.Collectors.toList());
         return new ApiResponse<>(true, "Clientes listados", responseDtos);
     }
 
