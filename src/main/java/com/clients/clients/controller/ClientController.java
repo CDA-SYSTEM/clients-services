@@ -93,7 +93,7 @@ public class ClientController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Actualizar cliente", description = "Actualiza los datos de un cliente")
-    public ApiResponse<?> updateClient(@PathVariable Long id, @RequestBody ClientUpdateDTO dto) {
+    public ApiResponse<?> updateClient(@PathVariable Long id, @Valid @RequestBody ClientUpdateDTO dto) {
         Object result = updateClientUseCase.execute(id, dto);
         if (result instanceof NotFoundErrorDTO) {
             return new ApiResponse<>(false, ((NotFoundErrorDTO) result).getMessage(), result);
