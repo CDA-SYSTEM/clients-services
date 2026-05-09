@@ -143,7 +143,7 @@ public class ClientController {
     }
 
     @GetMapping("/all")
-    @Operation(summary = "Listar todos los clientes", description = "Lista todos los clientes incluyendo los inactivos")
+    @Operation(summary = "Listar todos los clientes (incluso inactivos)", description = "Lista todos los clientes registrados en la base de datos, incluyendo aquellos que han sido desactivados (soft delete). El campo 'active' indica el estado de cada cliente.")
     public ApiResponse<?> getAllClientsIncludingInactive() {
         List<Client> clients = crudClientService.getAllClientsIncludingInactive();
         List<ClientResponseDTO> responseDtos = clients.stream().map(client -> {
