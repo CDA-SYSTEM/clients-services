@@ -56,7 +56,7 @@ public class ClientController {
 
     @PostMapping
     @Operation(summary = "Crear cliente", description = "Crea un nuevo cliente")
-    public ApiResponse<?> createClient(@RequestBody ClientRequestDTO dto) {
+    public ApiResponse<?> createClient(@Valid @RequestBody ClientRequestDTO dto) {
         try {
             Object result = createClientUseCase.execute(dto);
             if (result instanceof NotFoundErrorDTO) {
