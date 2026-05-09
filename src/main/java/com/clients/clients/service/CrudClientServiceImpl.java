@@ -33,16 +33,19 @@ public class CrudClientServiceImpl implements CrudClientService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Client getClientById(Long id) {
         return clientRepository.findById(id).orElse(null);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Client> getAllClients() {
         return clientRepository.findAllByActiveTrue();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Client> getAllClientsIncludingInactive() {
         return clientRepository.findAll();
     }
