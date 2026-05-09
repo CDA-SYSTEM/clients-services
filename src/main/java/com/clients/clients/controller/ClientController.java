@@ -64,27 +64,7 @@ public class ClientController {
             }
             // Mapear Client a ClientResponseDTO
             Client client = (Client) result;
-            ClientResponseDTO responseDto = new ClientResponseDTO();
-            responseDto.setId(client.getId());
-            responseDto.setNombre(client.getNombre());
-            responseDto.setApellido(client.getApellido());
-            responseDto.setBirthDate(client.getBirthDate());
-            responseDto.setIdentity(client.getIdentity());
-            responseDto.setDireccion(client.getDireccion());
-            responseDto.setCelular(client.getCelular());
-            responseDto.setEmail(client.getEmail());
-            if (client.getDocumentType() != null) {
-                ClientResponseDTO.DocumentTypeDTO docDto = new ClientResponseDTO.DocumentTypeDTO();
-                docDto.setId(client.getDocumentType().getId());
-                docDto.setType(client.getDocumentType().getType());
-                responseDto.setDocumentType(docDto);
-            }
-            if (client.getPersonType() != null) {
-                ClientResponseDTO.PersonTypeDTO perDto = new ClientResponseDTO.PersonTypeDTO();
-                perDto.setId(client.getPersonType().getId());
-                perDto.setType(client.getPersonType().getType());
-                responseDto.setPersonType(perDto);
-            }
+            ClientResponseDTO responseDto = toResponseDTO(client);
             return new ApiResponse<>(true, "Cliente creado", responseDto);
         } catch (IllegalArgumentException ex) {
             return new ApiResponse<>(false, ex.getMessage(), null);
