@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class CrudClientServiceImpl implements CrudClientService {
     private final ClientRepository clientRepository;
     private final CrudPersonTypeService personTypeService;
