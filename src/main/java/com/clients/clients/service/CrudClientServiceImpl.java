@@ -1,14 +1,10 @@
 package com.clients.clients.service;
 
 import com.clients.shared.entities.Client;
-import com.clients.shared.entities.PersonType;
-import com.clients.shared.entities.DocumentType;
-import com.clients.shared.dto.NotFoundErrorDTO;
 import com.clients.clients.repository.ClientRepository;
 import com.clients.clients.personType.CrudPersonTypeService;
 import com.clients.clients.documentType.CrudDocumentTypeService;
 import org.springframework.stereotype.Service;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
