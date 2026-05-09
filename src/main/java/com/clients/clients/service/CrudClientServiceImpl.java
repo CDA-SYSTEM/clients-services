@@ -1,18 +1,16 @@
 package com.clients.clients.service;
 
 import com.clients.shared.entities.Client;
-import com.clients.shared.entities.PersonType;
-import com.clients.shared.entities.DocumentType;
-import com.clients.shared.dto.NotFoundErrorDTO;
 import com.clients.clients.repository.ClientRepository;
 import com.clients.clients.personType.CrudPersonTypeService;
 import com.clients.clients.documentType.CrudDocumentTypeService;
 import org.springframework.stereotype.Service;
-import java.util.ArrayList;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class CrudClientServiceImpl implements CrudClientService {
     private final ClientRepository clientRepository;
     private final CrudPersonTypeService personTypeService;
@@ -35,16 +33,19 @@ public class CrudClientServiceImpl implements CrudClientService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Client getClientById(Long id) {
         return clientRepository.findById(id).orElse(null);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Client> getAllClients() {
         return clientRepository.findAllByActiveTrue();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Client> getAllClientsIncludingInactive() {
         return clientRepository.findAll();
     }
@@ -75,11 +76,13 @@ public class CrudClientServiceImpl implements CrudClientService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Client> getActiveClientById(Long id) {
         return clientRepository.findByIdAndActiveTrue(id);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Client> getClientByIdIncludingInactive(Long id) {
         return clientRepository.findById(id);
     }

@@ -14,6 +14,7 @@ import com.clients.shared.dto.NotFoundErrorDTO;
 import com.clients.shared.utils.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,7 +56,7 @@ public class ClientController {
 
     @PostMapping
     @Operation(summary = "Crear cliente", description = "Crea un nuevo cliente")
-    public ApiResponse<?> createClient(@RequestBody ClientRequestDTO dto) {
+    public ApiResponse<?> createClient(@Valid @RequestBody ClientRequestDTO dto) {
         try {
             Object result = createClientUseCase.execute(dto);
             if (result instanceof NotFoundErrorDTO) {
@@ -63,27 +64,7 @@ public class ClientController {
             }
             // Mapear Client a ClientResponseDTO
             Client client = (Client) result;
-            ClientResponseDTO responseDto = new ClientResponseDTO();
-            responseDto.setId(client.getId());
-            responseDto.setNombre(client.getNombre());
-            responseDto.setApellido(client.getApellido());
-            responseDto.setBirthDate(client.getBirthDate());
-            responseDto.setIdentity(client.getIdentity());
-            responseDto.setDireccion(client.getDireccion());
-            responseDto.setCelular(client.getCelular());
-            responseDto.setEmail(client.getEmail());
-            if (client.getDocumentType() != null) {
-                ClientResponseDTO.DocumentTypeDTO docDto = new ClientResponseDTO.DocumentTypeDTO();
-                docDto.setId(client.getDocumentType().getId());
-                docDto.setType(client.getDocumentType().getType());
-                responseDto.setDocumentType(docDto);
-            }
-            if (client.getPersonType() != null) {
-                ClientResponseDTO.PersonTypeDTO perDto = new ClientResponseDTO.PersonTypeDTO();
-                perDto.setId(client.getPersonType().getId());
-                perDto.setType(client.getPersonType().getType());
-                responseDto.setPersonType(perDto);
-            }
+            ClientResponseDTO responseDto = toResponseDTO(client);
             return new ApiResponse<>(true, "Cliente creado", responseDto);
         } catch (IllegalArgumentException ex) {
             return new ApiResponse<>(false, ex.getMessage(), null);
@@ -92,7 +73,7 @@ public class ClientController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Actualizar cliente", description = "Actualiza los datos de un cliente")
-    public ApiResponse<?> updateClient(@PathVariable Long id, @RequestBody ClientUpdateDTO dto) {
+    public ApiResponse<?> updateClient(@PathVariable Long id, @Valid @RequestBody ClientUpdateDTO dto) {
         Object result = updateClientUseCase.execute(id, dto);
         if (result instanceof NotFoundErrorDTO) {
             return new ApiResponse<>(false, ((NotFoundErrorDTO) result).getMessage(), result);
@@ -111,97 +92,28 @@ public class ClientController {
     }
 
      @GetMapping("/{id}")
-    @Operation(summary = "Obtener cliente por ID", description = "Obtiene los datos de un cliente activo por su ID")
+    @Operation(summary = "Obtener cliente activo por ID", description = "Obtiene los datos de un cliente solo si está activo (no ha sido eliminado con soft delete). Retorna error si no existe o está inactivo.")
     public ApiResponse<?> getClientById(@PathVariable Long id) {
         return crudClientService.getActiveClientById(id)
-                .map(client -> {
-                    ClientResponseDTO responseDto = new ClientResponseDTO();
-                    responseDto.setId(client.getId());
-                    responseDto.setNombre(client.getNombre());
-                    responseDto.setApellido(client.getApellido());
-                    responseDto.setBirthDate(client.getBirthDate());
-                    responseDto.setIdentity(client.getIdentity());
-                    responseDto.setDireccion(client.getDireccion());
-                    responseDto.setCelular(client.getCelular());
-                    responseDto.setEmail(client.getEmail());
-                    if (client.getDocumentType() != null) {
-                        ClientResponseDTO.DocumentTypeDTO docDto = new ClientResponseDTO.DocumentTypeDTO();
-                        docDto.setId(client.getDocumentType().getId());
-                        docDto.setType(client.getDocumentType().getType());
-                        responseDto.setDocumentType(docDto);
-                    }
-                    if (client.getPersonType() != null) {
-                        ClientResponseDTO.PersonTypeDTO perDto = new ClientResponseDTO.PersonTypeDTO();
-                        perDto.setId(client.getPersonType().getId());
-                        perDto.setType(client.getPersonType().getType());
-                        responseDto.setPersonType(perDto);
-                    }
-                    return new ApiResponse<>(true, "Cliente encontrado", responseDto);
-                })
+                .map(client -> new ApiResponse<>(true, "Cliente encontrado", toResponseDTO(client)))
                 .orElse(new ApiResponse<>(false, "Cliente no encontrado o inactivo", null));
     }
 
     @GetMapping("/all")
-    @Operation(summary = "Listar todos los clientes", description = "Lista todos los clientes incluyendo los inactivos")
+    @Operation(summary = "Listar todos los clientes (incluso inactivos)", description = "Lista todos los clientes registrados en la base de datos, incluyendo aquellos que han sido desactivados (soft delete). El campo 'active' indica el estado de cada cliente.")
     public ApiResponse<?> getAllClientsIncludingInactive() {
         List<Client> clients = crudClientService.getAllClientsIncludingInactive();
-        List<ClientResponseDTO> responseDtos = clients.stream().map(client -> {
-            ClientResponseDTO dto = new ClientResponseDTO();
-            dto.setId(client.getId());
-            dto.setNombre(client.getNombre());
-            dto.setApellido(client.getApellido());
-            dto.setBirthDate(client.getBirthDate());
-            dto.setIdentity(client.getIdentity());
-            dto.setDireccion(client.getDireccion());
-            dto.setCelular(client.getCelular());
-            dto.setEmail(client.getEmail());
-            dto.setActive(client.isActive());
-            if (client.getDocumentType() != null) {
-                ClientResponseDTO.DocumentTypeDTO docDto = new ClientResponseDTO.DocumentTypeDTO();
-                docDto.setId(client.getDocumentType().getId());
-                docDto.setType(client.getDocumentType().getType());
-                dto.setDocumentType(docDto);
-            }
-            if (client.getPersonType() != null) {
-                ClientResponseDTO.PersonTypeDTO perDto = new ClientResponseDTO.PersonTypeDTO();
-                perDto.setId(client.getPersonType().getId());
-                perDto.setType(client.getPersonType().getType());
-                dto.setPersonType(perDto);
-            }
-            return dto;
-        }).collect(java.util.stream.Collectors.toList());
+        List<ClientResponseDTO> responseDtos = clients.stream()
+                .map(this::toResponseDTO)
+                .collect(java.util.stream.Collectors.toList());
         return new ApiResponse<>(true, "Clientes listados", responseDtos);
     }
 
     @GetMapping("/{id}/full")
-    @Operation(summary = "Obtener cliente por ID (sin filtro)", description = "Obtiene los datos de un cliente por su ID sin importar su estado activo")
+    @Operation(summary = "Obtener cliente por ID (sin filtro de estado)", description = "Obtiene los datos de un cliente por su ID independientemente de si está activo o inactivo. Útil para administración y auditoría.")
     public ApiResponse<?> getClientByIdIncludingInactive(@PathVariable Long id) {
         return crudClientService.getClientByIdIncludingInactive(id)
-                .map(client -> {
-                    ClientResponseDTO responseDto = new ClientResponseDTO();
-                    responseDto.setId(client.getId());
-                    responseDto.setNombre(client.getNombre());
-                    responseDto.setApellido(client.getApellido());
-                    responseDto.setBirthDate(client.getBirthDate());
-                    responseDto.setIdentity(client.getIdentity());
-                    responseDto.setDireccion(client.getDireccion());
-                    responseDto.setCelular(client.getCelular());
-                    responseDto.setEmail(client.getEmail());
-                    responseDto.setActive(client.isActive());
-                    if (client.getDocumentType() != null) {
-                        ClientResponseDTO.DocumentTypeDTO docDto = new ClientResponseDTO.DocumentTypeDTO();
-                        docDto.setId(client.getDocumentType().getId());
-                        docDto.setType(client.getDocumentType().getType());
-                        responseDto.setDocumentType(docDto);
-                    }
-                    if (client.getPersonType() != null) {
-                        ClientResponseDTO.PersonTypeDTO perDto = new ClientResponseDTO.PersonTypeDTO();
-                        perDto.setId(client.getPersonType().getId());
-                        perDto.setType(client.getPersonType().getType());
-                        responseDto.setPersonType(perDto);
-                    }
-                    return new ApiResponse<>(true, "Cliente encontrado", responseDto);
-                })
+                .map(client -> new ApiResponse<>(true, "Cliente encontrado", toResponseDTO(client)))
                 .orElse(new ApiResponse<>(false, "Cliente no encontrado", null));
     }
 
@@ -214,5 +126,31 @@ public class ClientController {
         } catch (Exception ex) {
             return new ApiResponse<>(false, ex.getMessage(), null);
         }
+    }
+
+    private ClientResponseDTO toResponseDTO(Client client) {
+        ClientResponseDTO dto = new ClientResponseDTO();
+        dto.setId(client.getId());
+        dto.setNombre(client.getNombre());
+        dto.setApellido(client.getApellido());
+        dto.setBirthDate(client.getBirthDate());
+        dto.setIdentity(client.getIdentity());
+        dto.setDireccion(client.getDireccion());
+        dto.setCelular(client.getCelular());
+        dto.setEmail(client.getEmail());
+        dto.setActive(client.isActive());
+        if (client.getDocumentType() != null) {
+            ClientResponseDTO.DocumentTypeDTO docDto = new ClientResponseDTO.DocumentTypeDTO();
+            docDto.setId(client.getDocumentType().getId());
+            docDto.setType(client.getDocumentType().getType());
+            dto.setDocumentType(docDto);
+        }
+        if (client.getPersonType() != null) {
+            ClientResponseDTO.PersonTypeDTO perDto = new ClientResponseDTO.PersonTypeDTO();
+            perDto.setId(client.getPersonType().getId());
+            perDto.setType(client.getPersonType().getType());
+            dto.setPersonType(perDto);
+        }
+        return dto;
     }
 }

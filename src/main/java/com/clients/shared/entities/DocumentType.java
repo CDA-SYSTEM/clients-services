@@ -1,5 +1,6 @@
 package com.clients.shared.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -14,6 +15,7 @@ public class DocumentType {
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "documentType")
+    @JsonIgnore
     private java.util.List<Client> clients;
 
     // Getters and setters

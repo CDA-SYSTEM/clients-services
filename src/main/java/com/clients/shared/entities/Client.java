@@ -1,5 +1,6 @@
 package com.clients.shared.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
@@ -36,10 +37,12 @@ public class Client {
 
     @ManyToOne
     @JoinColumn(name = "document_type_id")
+    @JsonIgnoreProperties({"clients"})
     private DocumentType documentType;
 
     @ManyToOne
     @JoinColumn(name = "person_type_id")
+    @JsonIgnoreProperties({"clients"})
     private PersonType personType;
 
     // Getters and setters
