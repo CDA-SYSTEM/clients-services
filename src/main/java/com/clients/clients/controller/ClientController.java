@@ -216,4 +216,30 @@ public class ClientController {
             return new ApiResponse<>(false, ex.getMessage(), null);
         }
     }
+
+    private ClientResponseDTO toResponseDTO(Client client) {
+        ClientResponseDTO dto = new ClientResponseDTO();
+        dto.setId(client.getId());
+        dto.setNombre(client.getNombre());
+        dto.setApellido(client.getApellido());
+        dto.setBirthDate(client.getBirthDate());
+        dto.setIdentity(client.getIdentity());
+        dto.setDireccion(client.getDireccion());
+        dto.setCelular(client.getCelular());
+        dto.setEmail(client.getEmail());
+        dto.setActive(client.isActive());
+        if (client.getDocumentType() != null) {
+            ClientResponseDTO.DocumentTypeDTO docDto = new ClientResponseDTO.DocumentTypeDTO();
+            docDto.setId(client.getDocumentType().getId());
+            docDto.setType(client.getDocumentType().getType());
+            dto.setDocumentType(docDto);
+        }
+        if (client.getPersonType() != null) {
+            ClientResponseDTO.PersonTypeDTO perDto = new ClientResponseDTO.PersonTypeDTO();
+            perDto.setId(client.getPersonType().getId());
+            perDto.setType(client.getPersonType().getType());
+            dto.setPersonType(perDto);
+        }
+        return dto;
+    }
 }
