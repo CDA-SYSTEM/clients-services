@@ -95,30 +95,7 @@ public class ClientController {
     @Operation(summary = "Obtener cliente activo por ID", description = "Obtiene los datos de un cliente solo si está activo (no ha sido eliminado con soft delete). Retorna error si no existe o está inactivo.")
     public ApiResponse<?> getClientById(@PathVariable Long id) {
         return crudClientService.getActiveClientById(id)
-                .map(client -> {
-                    ClientResponseDTO responseDto = new ClientResponseDTO();
-                    responseDto.setId(client.getId());
-                    responseDto.setNombre(client.getNombre());
-                    responseDto.setApellido(client.getApellido());
-                    responseDto.setBirthDate(client.getBirthDate());
-                    responseDto.setIdentity(client.getIdentity());
-                    responseDto.setDireccion(client.getDireccion());
-                    responseDto.setCelular(client.getCelular());
-                    responseDto.setEmail(client.getEmail());
-                    if (client.getDocumentType() != null) {
-                        ClientResponseDTO.DocumentTypeDTO docDto = new ClientResponseDTO.DocumentTypeDTO();
-                        docDto.setId(client.getDocumentType().getId());
-                        docDto.setType(client.getDocumentType().getType());
-                        responseDto.setDocumentType(docDto);
-                    }
-                    if (client.getPersonType() != null) {
-                        ClientResponseDTO.PersonTypeDTO perDto = new ClientResponseDTO.PersonTypeDTO();
-                        perDto.setId(client.getPersonType().getId());
-                        perDto.setType(client.getPersonType().getType());
-                        responseDto.setPersonType(perDto);
-                    }
-                    return new ApiResponse<>(true, "Cliente encontrado", responseDto);
-                })
+                .map(client -> new ApiResponse<>(true, "Cliente encontrado", toResponseDTO(client)))
                 .orElse(new ApiResponse<>(false, "Cliente no encontrado o inactivo", null));
     }
 
