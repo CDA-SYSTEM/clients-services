@@ -5,6 +5,7 @@ import com.clients.clients.repository.ClientRepository;
 import com.clients.clients.personType.CrudPersonTypeService;
 import com.clients.clients.documentType.CrudDocumentTypeService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
