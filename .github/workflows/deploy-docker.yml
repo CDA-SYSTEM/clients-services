@@ -80,6 +80,9 @@ jobs:
               -e SPRING_RABBITMQ_USERNAME="${{ secrets.SPRING_RABBITMQ_USERNAME }}" \
               -e SPRING_RABBITMQ_PASSWORD="${{ secrets.SPRING_RABBITMQ_PASSWORD }}" \
               -e APP_MESSAGING_CLIENT_QUEUE="${{ secrets.APP_MESSAGING_CLIENT_QUEUE }}" \
+              -e API_KEY="${{ secrets.API_KEY }}" \
+              -e SWAGGER_USER="${{ secrets.SWAGGER_USER }}" \
+              -e SWAGGER_PASSWORD="${{ secrets.SWAGGER_PASSWORD }}" \
               --restart unless-stopped \
               ghcr.io/${{ env.REPO_LC }}:latest
 
