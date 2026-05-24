@@ -13,14 +13,16 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitConfig {
 
+	public static final String TRACKER_EXCHANGE = "cda.domain.events";
+
 	@Bean
 	public Queue clientServiceQueue(@Value("${app.messaging.client-queue}") String queueName) {
 		return QueueBuilder.durable(queueName).build();
 	}
 
 	@Bean
-	public TopicExchange trackerExchange(@Value("${app.messaging.tracker-exchange}") String exchangeName) {
-		return ExchangeBuilder.topicExchange(exchangeName).durable(true).build();
+	public TopicExchange trackerExchange() {
+		return ExchangeBuilder.topicExchange(TRACKER_EXCHANGE).durable(true).build();
 	}
 
 	@Bean

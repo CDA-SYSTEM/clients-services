@@ -26,8 +26,7 @@ spring.rabbitmq.password=${RABBITMQ_PASSWORD:guest}
 # Cola que consume este servicio (RPC)
 app.messaging.client-queue=${RABBITMQ_CLIENT_QUEUE:client-service-queue}
 
-# Exchange y cola para eventos del Tracker-Service (topic exchange)
-app.messaging.tracker-exchange=${RABBITMQ_TRACKER_EXCHANGE:cda.domain.events}
+# Cola para eventos del Tracker-Service
 app.messaging.tracker-queue=${RABBITMQ_TRACKER_QUEUE:tracker_service.queue}
 
 # API Key para autenticacion de requests via header x-api-key
