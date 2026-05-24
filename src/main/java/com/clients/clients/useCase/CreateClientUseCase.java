@@ -7,6 +7,8 @@ import com.clients.clients.service.CrudClientService;
 import com.clients.clients.personType.CrudPersonTypeService;
 import com.clients.clients.documentType.CrudDocumentTypeService;
 import com.clients.clients.dto.ClientRequestDTO;
+import com.clients.messaging.ClientCreatedEvent;
+import com.clients.messaging.ClientEventPublisher;
 import com.clients.shared.dto.NotFoundErrorDTO;
 import org.springframework.stereotype.Component;
 
@@ -15,13 +17,16 @@ public class CreateClientUseCase {
     private final CrudClientService crudClientService;
     private final CrudPersonTypeService personTypeService;
     private final CrudDocumentTypeService documentTypeService;
+    private final ClientEventPublisher clientEventPublisher;
 
     public CreateClientUseCase(CrudClientService crudClientService,
                                CrudPersonTypeService personTypeService,
-                               CrudDocumentTypeService documentTypeService) {
+                               CrudDocumentTypeService documentTypeService,
+                               ClientEventPublisher clientEventPublisher) {
         this.crudClientService = crudClientService;
         this.personTypeService = personTypeService;
         this.documentTypeService = documentTypeService;
+        this.clientEventPublisher = clientEventPublisher;
     }
 
     public Object execute(ClientRequestDTO dto) {
@@ -46,6 +51,16 @@ public class CreateClientUseCase {
         client.setEmail(dto.getEmail());
         client.setPersonType(personType);
         client.setDocumentType(documentType);
-        return crudClientService.createClient(client);
+
+        Client savedClient = crudClientService.createClient(client);
+
+        ClientCreatedEvent event = new ClientCreatedEvent(
+                savedClient.getId().toString(),
+                savedClient.getNombre() + " " + savedClient.getApellido(),
+                savedClient.getIdentity()
+        );
+        clientEventPublisher.publishClientCreated(event);
+
+        return savedClient;
     }
 }
