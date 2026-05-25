@@ -23,7 +23,12 @@ public class ClientEventPublisher {
     }
 
     public void publishClientCreated(ClientCreatedEvent event) {
-        log.info("Publicando evento cliente.registro.creado para cliente id={}", event.getId());
-        rabbitTemplate.convertAndSend(exchange, ROUTING_KEY_CLIENTE_REGISTRADO, event);
+        try {
+            rabbitTemplate.convertAndSend(exchange, ROUTING_KEY_CLIENTE_REGISTRADO, event);
+            log.info("Evento cliente.registro.creado publicado para cliente id={}", event.getId());
+        } catch (Exception e) {
+            log.error("Error al publicar evento cliente.registro.creado para cliente id={}: {}",
+                    event.getId(), e.getMessage());
+        }
     }
 }
