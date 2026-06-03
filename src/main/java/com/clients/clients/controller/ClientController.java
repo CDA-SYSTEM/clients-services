@@ -2,11 +2,13 @@ package com.clients.clients.controller;
 
 import com.clients.clients.useCase.CreateClientUseCase;
 import com.clients.clients.useCase.UpdateClientUseCase;
+import com.clients.clients.dto.AdminStatsDTO;
 import com.clients.clients.dto.ClientRequestDTO;
 import com.clients.clients.dto.ClientUpdateDTO;
 import com.clients.clients.dto.ClientSearchFilterDTO;
 import com.clients.clients.dto.ClientListResponseDTO;
 import com.clients.clients.dto.ClientResponseDTO;
+import com.clients.clients.service.AdminStatsService;
 import java.util.List;
 import com.clients.clients.service.ClientSearchService;
 import com.clients.shared.entities.Client;
@@ -27,13 +29,15 @@ public class ClientController {
     private final UpdateClientUseCase updateClientUseCase;
     private final ClientSearchService clientSearchService;
     private final com.clients.clients.service.CrudClientService crudClientService;
+    private final AdminStatsService adminStatsService;
 
     @Autowired
-    public ClientController(CreateClientUseCase createClientUseCase, UpdateClientUseCase updateClientUseCase, ClientSearchService clientSearchService, com.clients.clients.service.CrudClientService crudClientService) {
+    public ClientController(CreateClientUseCase createClientUseCase, UpdateClientUseCase updateClientUseCase, ClientSearchService clientSearchService, com.clients.clients.service.CrudClientService crudClientService, AdminStatsService adminStatsService) {
         this.createClientUseCase = createClientUseCase;
         this.updateClientUseCase = updateClientUseCase;
         this.clientSearchService = clientSearchService;
         this.crudClientService = crudClientService;
+        this.adminStatsService = adminStatsService;
     }
     @GetMapping
     @Operation(summary = "Listar clientes", description = "Lista clientes paginados y filtrados")
@@ -126,6 +130,13 @@ public class ClientController {
         } catch (Exception ex) {
             return new ApiResponse<>(false, ex.getMessage(), null);
         }
+    }
+
+    @GetMapping("/stats")
+    @Operation(summary = "Estadísticas de administración", description = "Obtiene estadísticas agregadas de clientes (totales, por tipo, etc.)")
+    public ApiResponse<AdminStatsDTO> getAdminStats() {
+        AdminStatsDTO stats = adminStatsService.getStats();
+        return new ApiResponse<>(true, "Estadísticas de clientes", stats);
     }
 
     private ClientResponseDTO toResponseDTO(Client client) {
