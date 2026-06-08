@@ -36,7 +36,9 @@ public class ClientSearchServiceImpl implements ClientSearchService {
             dto.setBirthDate(client.getBirthDate());
             dto.setCelular(client.getCelular());
             dto.setEmail(client.getEmail());
-            // Eliminar setIdentity y setDireccion, ya no están en el filtro ni DTO
+            dto.setActive(client.isActive());
+            dto.setIdentity(client.getIdentity());
+            dto.setDireccion(client.getDireccion());
             if (client.getDocumentType() != null) {
                 ClientResponseDTO.DocumentTypeDTO docDto = new ClientResponseDTO.DocumentTypeDTO();
                 docDto.setId(client.getDocumentType().getId());
